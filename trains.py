@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import random
+import math
 
 game_state = {
    # Rules map, defines basic rules of the game.
@@ -8,6 +9,7 @@ game_state = {
       # Range for number of trips per round
       "trips" : (7, 12),
       "random_factor" : (1.00, 0.07),
+      "trip_turn_random_term" : (1, 10),
       },
    # Goods map, defines; goods_name : statistical_weight, base_unit_price, min_unit, max_unit
    "goods_map": {
@@ -20,7 +22,9 @@ game_state = {
    # Goods roll, get a goods from a random roll (created at game start).
    "goods_roll" : [],
    # City map (will get populated with the cities of the current game)
-   "city_map" : {},
+   "city_map" : [],
+   # Mean distance to center
+   "city_mean_dist" : None,
 }
 
 def random_factor(state):
@@ -36,17 +40,18 @@ def input_add_city(state):
    city_name           = raw_input()
    distance_to_center  = raw_input()
    degrees             = raw_input()
-   state["city_map"][city_name] = (int(distance_to_center), int(degrees))
+   state["city_map"].append((int(distance_to_center), int(degrees), city_name))
    return False
 
 def input_print_city_map(state):
-   for key, value in state["city_map"].iteritems():
-      print(key + " - " + str(value[0]) + "m from center at " + str(value[1]) + "degrees.")
+   for value in state["city_map"]:
+      print(value[2] + " - " + str(value[0]) + "m from center at " + str(value[1]) + "degrees.")
 
 def create_trips(state):
    number_of_trips = random.randint(state["rules_map"]["trips"][0], state["rules_map"]["trips"][1])
    goods_map = state["goods_map"]
    city_map  = state["city_map"]
+   city_mean_dist  = state["city_mean_dist"]
 
    """ Loop over number of trips for round and generate random trips """
    for n in range(0, number_of_trips):
@@ -59,15 +64,30 @@ def create_trips(state):
       while city2 == city1:
          city2 = random.randint(0, len(city_map) - 1)
       randfac = random_factor(state)
-      print(city1)
-      print(city2)
-      print(randfac)
+      city1 = city_map[city1]
+      city2 = city_map[city2]
+
+      city1_fac = city1[0] / city_mean_dist
+      city2_fac = city2[0] / city_mean_dist
+      city_dist = math.sqrt(city1[0]*city1[0] + city2[0]*city2[0] - 2*city1[0]*city2[0]*math.cos(math.radians(city1[1]-city2[1])))
+      city_dist_fac = city_dist / city_mean_dist 
+      print("City dist  = " + str(city_dist))
+      print("City 1 fac = " + str(city1_fac))
+      print("City 1 fac = " + str(city2_fac))
+      print("City   fac = " + str(city_dist_fac))
+      print("Rand   fac = " + str(randfac))
+
+      total_fac = city1_fac * city2_fac * city_dist_fac * randfac
+
+      print("Total fac = " + str(total_fac))
 
 
       """ Generate goods and price """
       goods = state["goods_roll"][random.randint(0, len(state["goods_roll"]) - 1)]
       load  = random.randint(goods_map[goods][2], goods_map[goods][3])
       print(goods + " : " + str(load))
+
+      """ Generate number of turns """
 
 
 def game_turn(state):
@@ -83,10 +103,20 @@ game_driver_map = {
 def initialize_game(state):
    print("initializing")
    
+   city_map = state["city_map"]
+
    print("Checking city map")
-   if len(state["city_map"]) < 2:
+   if len(city_map) < 2:
       print("City map must be a least size 2.")
       return False
+   
+   print("Calculating mean distance to center.")
+   mean_dist = 0.0
+   for value in city_map:
+      mean_dist = mean_dist + value[0]
+   mean_dist = mean_dist / len(city_map)
+   print(mean_dist)
+   state["city_mean_dist"] = mean_dist
 
    print("Setting up goods roll map")
    for key, value in state["goods_map"].iteritems():
