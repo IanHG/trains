@@ -10,6 +10,8 @@ game_state = {
       "trips" : (7, 12),
       "random_factor" : (1.00, 0.07),
       "trip_turn_random_term" : (1, 10),
+      "trip_die"      : (1, 6),
+      "trip_mean_die" : None,
       },
    # Goods map, defines; goods_name : statistical_weight, base_unit_price, min_unit, max_unit
    "goods_map": {
@@ -30,6 +32,9 @@ game_state = {
 def random_factor(state):
    rule_random = state["rules_map"]["random_factor"]
    return random.normalvariate(rule_random[0], rule_random[1])
+
+def roundup(x):
+   return int(math.ceil(x / 10.0)) * 10
 
 def quit(state):
    return True
@@ -71,23 +76,25 @@ def create_trips(state):
       city2_fac = city2[0] / city_mean_dist
       city_dist = math.sqrt(city1[0]*city1[0] + city2[0]*city2[0] - 2*city1[0]*city2[0]*math.cos(math.radians(city1[1]-city2[1])))
       city_dist_fac = city_dist / city_mean_dist 
-      print("City dist  = " + str(city_dist))
-      print("City 1 fac = " + str(city1_fac))
-      print("City 1 fac = " + str(city2_fac))
-      print("City   fac = " + str(city_dist_fac))
-      print("Rand   fac = " + str(randfac))
+      #print("City dist  = " + str(city_dist))
+      #print("City 1 fac = " + str(city1_fac))
+      #print("City 1 fac = " + str(city2_fac))
+      #print("City   fac = " + str(city_dist_fac))
+      #print("Rand   fac = " + str(randfac))
 
       total_fac = city1_fac * city2_fac * city_dist_fac * randfac
 
-      print("Total fac = " + str(total_fac))
+      #print("Total fac = " + str(total_fac))
 
 
       """ Generate goods and price """
       goods = state["goods_roll"][random.randint(0, len(state["goods_roll"]) - 1)]
       load  = random.randint(goods_map[goods][2], goods_map[goods][3])
-      print(goods + " : " + str(load))
+      price = roundup(goods_map[goods][1] * total_fac)
+      print(goods + " : " + str(load) + " at " + str(price))
 
       """ Generate number of turns """
+
 
 
 def game_turn(state):
