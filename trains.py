@@ -9,17 +9,18 @@ game_state = {
       # Range for number of trips per round
       "trips" : (7, 12),
       "random_factor" : (1.00, 0.07),
-      "trip_turn_random_term" : (1, 10),
+      "trip_turn_random_term" : (5, 10),
       "trip_die"      : (1, 6),
       "trip_mean_die" : None,
+      "trip_space"    : 10,
       },
    # Goods map, defines; goods_name : statistical_weight, base_unit_price, min_unit, max_unit
    "goods_map": {
-      "wood"   : (4, 100, 5, 15),
-      "stone"  : (3, 200, 3, 10),
-      "coal"   : (2, 300, 2, 7),
-      "silver" : (1, 400, 1, 5),
-      "gold"   : (1, 500, 1, 4),
+      "Wood"   : (4, 100, 5, 15),
+      "Stone"  : (3, 200, 3, 10),
+      "Coal"   : (2, 300, 2, 7),
+      "Silver" : (1, 400, 1, 5),
+      "Gold"   : (1, 500, 1, 4),
       },
    # Goods roll, get a goods from a random roll (created at game start).
    "goods_roll" : [],
@@ -39,6 +40,16 @@ def roundup(x):
 def quit(state):
    return True
 
+def print_train():
+   print("")
+   print("         o o o o ~~  ~~ ~                                      _____         ")
+   print("      o     _____         ________________ ________________ ___|_=_|_()__    ")
+   print("    .][_mm__|[]| ,===___ ||              | |              | |          |     ")
+   print("   >(_______|__|_|_GBRR_]_|              |_|              |_|          |_|   ")
+   print("   _/oo-OOOO-oo' !oo!!oo!=`!o!o!----!o!o!'=`!o!o!----!o!o!'=`!o!o--o!o!'     ")
+   print("=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=")
+   print("")
+
 #
 def input_add_city(state):
    print("Enter city name, then distance to center and lastly compas direction (degrees).")
@@ -47,6 +58,16 @@ def input_add_city(state):
    degrees             = raw_input()
    state["city_map"].append((int(distance_to_center), int(degrees), city_name))
    return False
+
+def input_load_cities_file(state):
+   filename = raw_input()
+   with open(filename) as f:
+      for line in f:
+         line_split = line.split(",")
+         city_name          = line_split[0]
+         distance_to_center = line_split[1]
+         degrees            = line_split[2]
+         state["city_map"].append((int(distance_to_center), int(degrees), city_name))
 
 def input_print_city_map(state):
    for value in state["city_map"]:
@@ -57,6 +78,8 @@ def create_trips(state):
    goods_map = state["goods_map"]
    city_map  = state["city_map"]
    city_mean_dist  = state["city_mean_dist"]
+
+   print_train()
 
    """ Loop over number of trips for round and generate random trips """
    for n in range(0, number_of_trips):
@@ -91,10 +114,16 @@ def create_trips(state):
       goods = state["goods_roll"][random.randint(0, len(state["goods_roll"]) - 1)]
       load  = random.randint(goods_map[goods][2], goods_map[goods][3])
       price = roundup(goods_map[goods][1] * total_fac)
-      print(goods + " : " + str(load) + " at " + str(price))
 
       """ Generate number of turns """
+      trip_turns = (city_dist / state["rules_map"]["trip_space"] * state["rules_map"]["trip_mean_die"]) + random.randint(state["rules_map"]["trip_turn_random_term"][0], state["rules_map"]["trip_turn_random_term"][1])
+      trip_turns = math.ceil(trip_turns * random_factor(state))
+      
+      #print(goods + " : " + str(load) + " at " 
+      print(repr(str(load)).ljust(5) + repr(goods).ljust(10) + " from " + repr(city1[2]).ljust(20) + " to " + repr(city2[2]).ljust(20) + " at " + repr(str(price)).ljust(6) + " in " + repr(str(int(trip_turns))).ljust(4))
+      print("")
 
+   print("=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=")
 
 
 def game_turn(state):
@@ -124,6 +153,8 @@ def initialize_game(state):
    mean_dist = mean_dist / len(city_map)
    print(mean_dist)
    state["city_mean_dist"] = mean_dist
+
+   state["rules_map"]["trip_mean_die"] = 3.5
 
    print("Setting up goods roll map")
    for key, value in state["goods_map"].iteritems():
@@ -156,10 +187,12 @@ def game_driver(state):
 
 setup_game_map = {
    "1" : ("Add city.", input_add_city),
-   "2" : ("Print city map.", input_print_city_map),
-   "3" : ("Start game!", game_driver),
-   "4" : ("Quit :C", quit),
+   "2" : ("Load cities from file.", input_load_cities_file),
+   "3" : ("Print city map.", input_print_city_map),
+   "4" : ("Start game!", game_driver),
+   "5" : ("Quit :C", quit),
 }
+
 
 # Print game header.
 def print_game_header():
@@ -176,14 +209,8 @@ def print_game_header():
    print("                | $$| $$     |  $$$$$$$| $$| $$  | $$ /$$$$$$$/              ")
    print("                |__/|__/      \_______/|__/|__/  |__/|_______/               ")
    print("")
-   print("")
-   print("         o o o o ~~  ~~ ~                                      _____         ")
-   print("      o     _____         ________________ ________________ ___|_=_|_()__    ")
-   print("    .][_mm__|[]| ,===___ ||              | |              | |          |     ")
-   print("   >(_______|__|_|_GBRR_]_|              |_|              |_|          |_|   ")
-   print("   _/oo-OOOO-oo' !oo!!oo!=`!o!o!----!o!o!'=`!o!o!----!o!o!'=`!o!o--o!o!'     ")
-   print("=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=")
-   print("")
+
+   print_train()
 
 
 # Define main
