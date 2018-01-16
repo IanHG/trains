@@ -1,0 +1,20 @@
+
+
+Money:
+   Each players starts with $2000-$3000. This money is used for buying trains
+   and tracks from the bank, renting tracks from other players, 
+   and as collateral for failed trips.
+
+   Money is earned by completing trips, and selling owned equipment.
+   Equipment can be sold to other players for whatever price can be negotiated,
+   or to the bank for half the purchase price.
+
+   Each player is allowed a credit of up to -$1000 when bidding for trips.
+   No credit is allowed for buying, so if a player is in minus no purchases
+   can be made.
+
+   Pricelist:
+      Lokomotive  $500
+      Wagon       $100
+
+      10cm tracks $100
