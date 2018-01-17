@@ -1,11 +1,11 @@
 Game overview:
    The game consists of a set of game turns. Each turn consists of three phases:
       1) The buying phase, where each player is allowed to buy equipment with the money the
-         player has in the bank (see pricelist below).
+         player has in the bank (see price list below).
       2) The bidding phase, where each player "bids" on which of the current trips he/she can do.
          a) First a set of trips is generated.
          b) Then players are allowed to bid on which trips the player wants to do (this can be done as a public or private bidding).
-            Note that players need to have the bank balance to pay for colleteral for all trips he/she wins.
+            Note that players need to have the bank balance to pay for collateral for all trips he/she wins.
             i) This part should take 10 minutes where players can negotiate f.x. the renting of tracks and such.
          c) A winner is found for each trip starting with the top listed one and moving down the list.
             Note this may bind a players money so they cannot undertake other trips this round,
@@ -44,7 +44,7 @@ Money:
    No credit is allowed for buying, so if a player is in minus no purchases
    can be made.
 
-   Pricelist:
+   Price list:
       Locomotive  $500
       Wagon       $100
 
@@ -54,4 +54,4 @@ Ending the game:
    The game ends either after a set amount of rounds or a set amount of time (or when you just don't want to play anymore).
    When the game ends the player with the most money wins!
    The money a has player has is equal to whatever he/she has in the bank,
-   adding the value he/she would get for selling his all his/her current equipment.
+   adding the value he/she would get for selling all his/her current equipment to the bank (half price).
