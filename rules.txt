@@ -6,7 +6,7 @@ Game overview:
          a) First a set of trips is generated.
          b) Then players are allowed to bid on which trips the player wants to do (this can be done as a public or private bidding).
             Note that players need to have the bank balance to pay for collateral for all trips he/she wins.
-            i) This part should take 10 minutes where players can negotiate f.x. the renting of tracks and such.
+            i) This part should take 2-5 minutes where players can negotiate f.x. the renting of tracks and such.
          c) A winner is found for each trip starting with the top listed one and moving down the list.
             Note this may bind a players money so they cannot undertake other trips this round,
             so maybe it is not always the best idea to take the first trip one is offered,
@@ -18,7 +18,7 @@ Game overview:
             This needs to be their own track, or a piece of track they have rented from another player.
             A piece of track can be used for any number of trips each game turn,
             which means that a player can use his own track for completing trips even if he also rented it out to another player.
-            i)  For deciding the winner of a trip, number of wagons is most important, then number of turns.
+            i)  For deciding the winner of a trip, number of wagons is most important, then number of turns (this can be reversed if desired).
       3) The trip phase, where all players undertakes the trips he/she won in the bidding phase.
          a) First players run all their trips.
          b) Then players get paid by the bank for any succesful trips and pays the bank for any failed trips.
@@ -32,7 +32,8 @@ Trips:
    the trip is a success, else it is a failure.
 
 Money:
-   Each players starts with $2000-$3000 in the bank. This money is used for buying trains
+   Each players starts with $2000-$3000 in the bank (just decide on something). 
+   This money is used for buying trains
    and tracks from the bank, renting tracks from other players, 
    and as collateral for failed trips.
 

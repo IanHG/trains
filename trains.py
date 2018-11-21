@@ -7,20 +7,20 @@ game_state = {
    # Rules map, defines basic rules of the game.
    "rules_map" : {
       # Range for number of trips per round
-      "trips" : (7, 12),
+      "trips" : (6, 6),
       "random_factor" : (1.00, 0.07),
-      "trip_turn_random_term" : (5, 10),
+      "trip_turn_random_term" : (-1, 6),
       "trip_die"      : (1, 6),
       "trip_mean_die" : None,
       "trip_space"    : 10,
       },
-   # Goods map, defines; goods_name : statistical_weight, base_unit_price, min_unit, max_unit
+   # Goods map, defines; goods_name : statistical_weight, base_unit_price, min_unit, max_unit, liability in %
    "goods_map": {
-      "Wood"   : (4, 100, 5, 15),
-      "Stone"  : (3, 200, 3, 10),
-      "Coal"   : (2, 300, 2, 7),
-      "Silver" : (1, 400, 1, 5),
-      "Gold"   : (1, 500, 1, 4),
+      "Wood"   : (6, 100, 3, 10, 30),
+      "Stone"  : (4, 200, 3, 8 , 50),
+      "Coal"   : (3, 300, 2, 6 , 70),
+      "Silver" : (1, 400, 1, 3 , 95),
+      "Gold"   : (1, 500, 1, 2 , 110),
       },
    # Goods roll, get a goods from a random roll (created at game start).
    "goods_roll" : [],
@@ -73,6 +73,10 @@ def input_print_city_map(state):
    for value in state["city_map"]:
       print(value[2] + " - " + str(value[0]) + "m from center at " + str(value[1]) + "degrees.")
 
+def city_scale_factor(dist, city_mean_dist):
+   return (math.tanh(dist / city_mean_dist) + 1.0) / 2.0
+   #return dist / city_mean_dist
+
 def create_trips(state):
    number_of_trips = random.randint(state["rules_map"]["trips"][0], state["rules_map"]["trips"][1])
    goods_map = state["goods_map"]
@@ -95,10 +99,10 @@ def create_trips(state):
       city1 = city_map[city1]
       city2 = city_map[city2]
 
-      city1_fac = city1[0] / city_mean_dist
-      city2_fac = city2[0] / city_mean_dist
+      city1_fac = city_scale_factor(city1[0], city_mean_dist)
+      city2_fac = city_scale_factor(city2[0], city_mean_dist)
       city_dist = math.sqrt(city1[0]*city1[0] + city2[0]*city2[0] - 2*city1[0]*city2[0]*math.cos(math.radians(city1[1]-city2[1])))
-      city_dist_fac = city_dist / city_mean_dist 
+      city_dist_fac = city_scale_factor(city_dist, city_mean_dist)
       #print("City dist  = " + str(city_dist))
       #print("City 1 fac = " + str(city1_fac))
       #print("City 1 fac = " + str(city2_fac))
@@ -114,13 +118,14 @@ def create_trips(state):
       goods = state["goods_roll"][random.randint(0, len(state["goods_roll"]) - 1)]
       load  = random.randint(goods_map[goods][2], goods_map[goods][3])
       price = roundup(goods_map[goods][1] * total_fac)
+      liability = roundup(goods_map[goods][4] * price / 100) 
 
       """ Generate number of turns """
-      trip_turns = (city_dist / state["rules_map"]["trip_space"] * state["rules_map"]["trip_mean_die"]) + random.randint(state["rules_map"]["trip_turn_random_term"][0], state["rules_map"]["trip_turn_random_term"][1])
+      trip_turns = (city_dist / state["rules_map"]["trip_space"] / state["rules_map"]["trip_mean_die"]) + random.randint(state["rules_map"]["trip_turn_random_term"][0], state["rules_map"]["trip_turn_random_term"][1])
       trip_turns = math.ceil(trip_turns * random_factor(state))
       
       #print(goods + " : " + str(load) + " at " 
-      print(repr(str(load)).ljust(5) + repr(goods).ljust(10) + " from " + repr(city1[2]).ljust(20) + " to " + repr(city2[2]).ljust(20) + " at " + repr(str(price)).ljust(6) + " in " + repr(str(int(trip_turns))).ljust(4))
+      print(repr(str(load)).ljust(5) + repr(goods).ljust(10) + " from " + repr(city1[2]).ljust(20) + " to " + repr(city2[2]).ljust(20) + " at " + repr(str(price)).ljust(6) + " in " + repr(str(int(trip_turns))).ljust(4) + "  liability : " + repr(str(liability).ljust(5)))
       print("")
 
    print("=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=")
